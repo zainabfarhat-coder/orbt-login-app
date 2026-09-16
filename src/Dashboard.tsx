@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getSession, logout, type Session } from "./auth";
+import { getSession, type Session } from "./auth";
+import DashboardLayout from "./DashboardLayout";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -19,48 +20,33 @@ export default function Dashboard() {
 
   const name = session.email.split("@")[0];
   const isAdmin = session.role === "admin";
-  const eyebrowColor = isAdmin ? "text-[#C7642C]" : "text-[#1D7A5F]";
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5F7F6] px-4 py-8">
-      <div className="w-full max-w-[440px] bg-white border border-[#D8DED9] rounded-xl p-7">
-        <div className={`text-[11px] font-semibold mb-2.5 ${eyebrowColor}`}>
-          {isAdmin ? "Admin workspace" : "User workspace"}
-        </div>
-        <h1 className="font-serif text-[26px] m-0 mb-1.5 text-[#10241F]">
+    <DashboardLayout>
+      <div className="max-w-2xl">
+        <span className="inline-block text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-md px-2.5 py-1 mb-3 capitalize">
+          {isAdmin ? "Admin" : "User"}
+        </span>
+
+        <h1 className="text-2xl font-semibold text-gray-900 mb-1">
           Hello, {name}
         </h1>
-        <p className="text-[13.5px] text-[#5B6B63] mb-5">
-          Signed in as {session.email}
+        <p className="text-sm text-gray-500 mb-6">
+          {isAdmin
+            ? "Here's a quick overview of your partner console."
+            : "Here's a quick overview of your account."}
         </p>
 
-        <div className="grid grid-cols-2 gap-3 mb-5">
-          <div className="border border-[#D8DED9] rounded-lg px-3.5 py-3">
-            <div className="text-[11px] text-[#5B6B63]">Role</div>
-            <div className="text-sm font-semibold mt-0.5 text-[#10241F]">
-              {isAdmin ? "Administrator" : "Standard user"}
-            </div>
-          </div>
-          <div className="border border-[#D8DED9] rounded-lg px-3.5 py-3">
-            <div className="text-[11px] text-[#5B6B63]">Session</div>
-            <div className="text-sm font-semibold mt-0.5 text-[#10241F]">
-              Active
-            </div>
-          </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <p className="text-sm text-gray-500 mb-1">Signed in as</p>
+          <p className="text-sm font-medium text-gray-900 mb-4">
+            {session.email}
+          </p>
+          <p className="text-sm text-gray-500">
+            Use the sidebar to check your orders.
+          </p>
         </div>
-
-        <button
-          onClick={handleLogout}
-          className="px-3.5 py-2.5 rounded-lg border border-[#D8DED9] bg-transparent text-[13.5px] text-[#10241F] cursor-pointer"
-        >
-          Log out
-        </button>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

@@ -30,7 +30,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero */}
       <div className="max-w-3xl mx-auto px-6 pt-24 pb-20 text-center">
         <span className="inline-block text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-full px-3 py-1 mb-6">
           B2B payout platform
@@ -64,7 +63,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Feature strip */}
+      
       <div className="border-t border-gray-200 bg-white">
         <div className="max-w-5xl mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
           <div>
