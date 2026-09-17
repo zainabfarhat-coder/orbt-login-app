@@ -10,6 +10,15 @@ export interface Order {
   status: OrderStatus;
 }
 
+export const BRAND_CATALOG: { name: string; price: number }[] = [
+  { name: "Nike", price: 45 },
+  { name: "Adidas", price: 60 },
+  { name: "Puma", price: 30 },
+  { name: "Reebok", price: 50 },
+  { name: "Zara", price: 39 },
+  { name: "Hermes", price: 300 },
+];
+
 const ORDERS_PREFIX = "orbt-orders-";
 
 function ordersKey(email: string): string {
@@ -59,8 +68,6 @@ export function addOrder(
 export function getOrderById(email: string, id: string): Order | undefined {
   return getOrders(email).find((o) => o.id === id);
 }
-
-// ---- Admin helpers: read/update orders across ALL users ----
 
 export interface OrderWithOwner extends Order {
   ownerEmail: string;

@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getOrders, addOrder, ensureOrders, type Order, type OrderStatus } from "./orders";
+import {
+  getOrders,
+  addOrder,
+  ensureOrders,
+  BRAND_CATALOG,
+  type Order,
+  type OrderStatus,
+} from "./orders";
 import { getSession } from "./auth";
 import DashboardLayout from "./DashboardLayout";
 
@@ -16,9 +23,11 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [brandName, setBrandName] = useState("");
-  const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [formError, setFormError] = useState("");
+
+  const selectedBrand = BRAND_CATALOG.find((b) => b.name === brandName);
+  const price = selectedBrand?.price ?? 0;
 
   const loadOrders = () => {
     if (!session) return;
@@ -39,22 +48,15 @@ export default function OrdersPage() {
     e.preventDefault();
     setFormError("");
 
-    const priceNum = Number(price);
+    if (!brandName) {
+      setFormError("Choose a brand.");
+      return;
+    }
     const qtyNum = Number(quantity) || 1;
-
-    if (!brandName.trim()) {
-      setFormError("Enter a brand name.");
-      return;
-    }
-    if (!price || isNaN(priceNum) || priceNum <= 0) {
-      setFormError("Enter a valid price (numbers only).");
-      return;
-    }
     if (!session) return;
 
-    addOrder(session.email, brandName.trim(), priceNum, qtyNum);
+    addOrder(session.email, brandName, price, qtyNum);
     setBrandName("");
-    setPrice("");
     setQuantity("1");
     setShowAddForm(false);
     loadOrders();
@@ -86,7 +88,7 @@ export default function OrdersPage() {
               onClick={() => setShowAddForm((v) => !v)}
               className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
             >
-              Add order
+              Add to cart
             </button>
           </div>
         </div>
@@ -100,35 +102,31 @@ export default function OrdersPage() {
             <div className="flex flex-col sm:flex-row gap-3 items-start">
               <div className="flex-1 w-full">
                 <label className="text-xs font-medium text-gray-600 mb-1 block">
-                  Brand name
+                  Brand
                 </label>
-                <input
-                  name="order-brand-name"
-                  autoComplete="off"
-                  required
+                <select
                   value={brandName}
                   onChange={(e) => setBrandName(e.target.value)}
-                  placeholder="Nike"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
-                />
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm bg-white"
+                >
+                  <option value="">Select a brand…</option>
+                  {BRAND_CATALOG.map((b) => (
+                    <option key={b.name} value={b.name}>
+                      {b.name}
+                    </option>
+                  ))}
+                </select>
               </div>
+
               <div className="w-full sm:w-28">
                 <label className="text-xs font-medium text-gray-600 mb-1 block">
                   Price
                 </label>
-                <input
-                  name="order-price"
-                  autoComplete="off"
-                  required
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="45"
-                  className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
-                />
+                <div className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-600">
+                  {selectedBrand ? `$${price.toFixed(2)}` : "—"}
+                </div>
               </div>
+
               <div className="w-full sm:w-24">
                 <label className="text-xs font-medium text-gray-600 mb-1 block">
                   Qty
@@ -143,11 +141,12 @@ export default function OrdersPage() {
                   className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
                 />
               </div>
+
               <button
                 type="submit"
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors whitespace-nowrap mt-1 sm:mt-5"
               >
-                Save order
+                Add to cart
               </button>
             </div>
 

@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSession } from "./auth";
-import { getAllOrders, updateOrderStatus, type OrderWithOwner, type OrderStatus } from "./orders";
+import {
+  getAllOrders,
+  updateOrderStatus,
+  ensureOrders,
+  type OrderWithOwner,
+  type OrderStatus,
+} from "./orders";
 import DashboardLayout from "./DashboardLayout";
 
 const statusStyles: Record<OrderStatus, string> = {
@@ -16,6 +22,9 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState<OrderWithOwner[]>([]);
 
   const load = () => {
+    // Make sure there's always at least a demo account with orders,
+    // so this page never looks empty before any real user logs in.
+    ensureOrders("demo@orbt.com");
     setOrders(getAllOrders());
   };
 
@@ -25,7 +34,7 @@ export default function AdminOrders() {
       return;
     }
     load();
-    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!session || session.role !== "admin") return null;
@@ -70,9 +79,8 @@ export default function AdminOrders() {
             <tbody>
               {orders.map((order) => (
                 <tr key={`${order.ownerEmail}-${order.id}`} className="border-b border-gray-100 last:border-0">
-                  <td className="px-5 py-3.5">
-                    <div className="text-gray-900 font-medium">{order.ownerEmail}</div>
-                    <div className="text-xs text-gray-400">{order.ownerId}</div>
+                  <td className="px-5 py-3.5 text-gray-900 font-medium">
+                    {order.ownerEmail}
                   </td>
                   <td className="px-5 py-3.5 text-gray-900 font-medium">{order.brandName}</td>
                   <td className="px-5 py-3.5 text-gray-600">{order.date}</td>
